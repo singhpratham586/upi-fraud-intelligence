@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background-rgb: 242 232 216;
+    --color-surface-rgb: 255 249 240;
+    --color-surface-subtle-rgb: 248 241 229;
+    --color-text-main-rgb: 23 21 18;
+    --color-charcoal-rgb: 41 37 32;
+    --color-taupe-rgb: 140 126 110;
+    --color-accent-rgb: 201 107 53;
+    --color-accent-dark-rgb: 168 78 37;
+    --color-accent-light-rgb: 243 217 199;
+    --color-sage-rgb: 95 119 90;
+    --color-alert-rgb: 184 74 59;
+    --color-grain: rgba(23, 21, 18, 0.04);
+  }
+
+  .dark {
+    --color-background-rgb: 14 13 11;
+    --color-surface-rgb: 23 21 19;
+    --color-surface-subtle-rgb: 33 30 26;
+    --color-text-main-rgb: 247 242 235;
+    --color-charcoal-rgb: 227 217 204;
+    --color-taupe-rgb: 166 153 138;
+    --color-accent-rgb: 224 122 62;
+    --color-accent-dark-rgb: 242 142 83;
+    --color-accent-light-rgb: 61 35 20;
+    --color-sage-rgb: 136 168 130;
+    --color-alert-rgb: 229 91 73;
+    --color-grain: rgba(255, 255, 255, 0.035);
+  }
+
+  body {
+    background-color: rgb(var(--color-background-rgb));
+    color: rgb(var(--color-text-main-rgb));
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-editorial {
+    font-family: 'Newsreader', Georgia, serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--color-background-rgb));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-taupe-rgb) / 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--color-accent-rgb));
+}
+
+/* Subtle grain overlay */
+.bg-grain {
+  background-image: radial-gradient(var(--color-grain) 1px, transparent 0);
+  background-size: 24px 24px;
+}
