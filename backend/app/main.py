@@ -8,7 +8,8 @@ from app.routers import (
     detection,
     business_impact,
     sql_insights,
-    datasets
+    datasets,
+    auth
 )
 
 app = FastAPI(
@@ -46,6 +47,7 @@ app.include_router(detection.router, prefix=settings.API_PREFIX)
 app.include_router(business_impact.router, prefix=settings.API_PREFIX)
 app.include_router(sql_insights.router, prefix=settings.API_PREFIX)
 app.include_router(datasets.router, prefix=settings.API_PREFIX)
+app.include_router(auth.router, prefix=settings.API_PREFIX)
 
 if __name__ == "__main__":
     import uvicorn

@@ -141,10 +141,22 @@ The system includes a production query catalog covering 20 essential financial a
 18. False Positive Analysis: Legitimate High-Value Spenders
 19. Precision, Recall, and Ground-Truth Confusion Metrics
 20. Bi-Weekly Period-over-Period Risk Shift
+21. Saved Analyst Credentials & Authentication Audit Log (`users` table)
 
 ---
 
-## 8. Data Dictionary
+## 8. Authentication & Dataset Credential Persistence
+
+The platform includes an enterprise analyst authentication system integrated directly into the persistent dataset:
+
+- **Primary Authentication (Gmail)**: High-priority email sign-in with password verification, auto-account creation, and `@gmail.com` autocompletion.
+- **Enterprise SSO (Google & GitHub)**: Functional OAuth flow creating or syncing analyst credentials into the dataset.
+- **Dataset Storage (`users` table)**: Every login and registration is persisted into PostgreSQL / SQLite with `email`, hashed credentials / OAuth tokens, `provider`, `role`, `login_count`, and audit timestamps.
+- **Credential Inspector**: Analysts and risk managers can view all persisted operator credentials via the navbar **Saved Users** modal or via SQL Query 21 in the SQL Insights studio.
+
+---
+
+## 9. Data Dictionary
 
 | Column Name | Type | Description |
 | :--- | :--- | :--- |

@@ -237,3 +237,34 @@ export interface SQLQueryResult {
   explanation: string;
   interpretation: string;
 }
+
+export interface UserAccount {
+  id: number;
+  email: string;
+  full_name: string;
+  provider: 'gmail' | 'google' | 'github';
+  avatar_url?: string | null;
+  role: string;
+  login_count: number;
+  last_login_at: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  user: UserAccount;
+}
+
+export interface StoredCredentialRecord {
+  id: number;
+  email: string;
+  provider: string;
+  full_name: string;
+  role: string;
+  password_hint: string;
+  login_count: number;
+  last_login_at: string;
+  created_at: string;
+}

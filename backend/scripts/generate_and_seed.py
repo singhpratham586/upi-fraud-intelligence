@@ -12,6 +12,8 @@ if backend_dir not in sys.path:
 
 from app.database import engine, Base, SessionLocal
 from app.models.transaction import Transaction, DetectionResult, Investigation, DatasetMetadata
+from app.models.user import User
+from app.routers.auth import _hash_password
 from app.services.data_generator import generate_synthetic_transactions
 from app.services.iqr_detector import run_iqr_detection
 from app.services.isolation_forest import run_isolation_forest
@@ -24,6 +26,23 @@ def seed_database(total_records: int = 12500, random_seed: int = 42):
 
     db = SessionLocal()
     try:
+        # Ensure default analyst user exists in dataset
+        if db.query(User).count() == 0:
+            demo_user = User(
+                email="analyst@gmail.com",
+                password_hash=_hash_password("analyst123"),
+                full_name="Lead Risk Analyst",
+                provider="gmail",
+                avatar_url="https://api.dicebear.com/7.x/initials/svg?seed=Lead%20Risk%20Analyst",
+                role="Senior Risk Analyst",
+                login_count=1,
+                last_login_at=datetime.datetime.utcnow(),
+                created_at=datetime.datetime.utcnow()
+            )
+            db.add(demo_user)
+            db.commit()
+            print("Seeded default analyst user account into dataset.")
+
         # Check if already seeded
         existing_count = db.query(Transaction).count()
         if existing_count >= total_records:

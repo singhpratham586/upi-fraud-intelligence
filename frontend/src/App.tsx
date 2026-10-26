@@ -1,8 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { LoginModal } from './components/LoginModal';
+import { SavedCredentialsModal } from './components/SavedCredentialsModal';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TransactionsPage } from './pages/TransactionsPage';
@@ -14,23 +17,27 @@ import { MethodologyPage } from './pages/MethodologyPage';
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-background text-text-main font-sans selection:bg-accent selection:text-white transition-colors duration-200">
-          <Navbar />
-          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/transactions" element={<TransactionsPage />} />
-              <Route path="/detection-lab" element={<DetectionLabPage />} />
-              <Route path="/business-impact" element={<BusinessImpactPage />} />
-              <Route path="/sql-insights" element={<SQLInsightsPage />} />
-              <Route path="/methodology" element={<MethodologyPage />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col bg-background text-text-main font-sans selection:bg-accent selection:text-white transition-colors duration-200">
+            <Navbar />
+            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/transactions" element={<TransactionsPage />} />
+                <Route path="/detection-lab" element={<DetectionLabPage />} />
+                <Route path="/business-impact" element={<BusinessImpactPage />} />
+                <Route path="/sql-insights" element={<SQLInsightsPage />} />
+                <Route path="/methodology" element={<MethodologyPage />} />
+              </Routes>
+            </main>
+            <Footer />
+            <LoginModal />
+            <SavedCredentialsModal />
+          </div>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

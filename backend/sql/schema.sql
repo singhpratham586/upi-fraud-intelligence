@@ -91,3 +91,19 @@ CREATE TABLE IF NOT EXISTS dataset_metadata (
     random_seed INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(128) UNIQUE NOT NULL,
+    password_hash VARCHAR(256) NOT NULL,
+    full_name VARCHAR(128) NOT NULL,
+    provider VARCHAR(32) NOT NULL DEFAULT 'gmail',
+    avatar_url VARCHAR(256),
+    role VARCHAR(32) NOT NULL DEFAULT 'Risk Analyst',
+    login_count INTEGER NOT NULL DEFAULT 1,
+    last_login_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_provider ON users(provider);

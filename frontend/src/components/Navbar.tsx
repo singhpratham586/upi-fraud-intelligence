@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Database, Layers, TrendingUp, Search, BookOpen, Sun, Moon } from 'lucide-react';
+import { BarChart3, Database, Layers, TrendingUp, Search, BookOpen, Sun, Moon, LogIn, LogOut, KeyRound, UserCheck } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated, openLoginModal, openCredentialsModal, logout } = useAuth();
 
   const navLinks = [
     { path: '/dashboard', label: 'Overview', icon: BarChart3 },
@@ -61,8 +63,50 @@ export const Navbar: React.FC = () => {
           })}
         </nav>
 
-        {/* Status Indicator & Theme Toggle */}
+        {/* Status Indicator, Auth Controls & Theme Toggle */}
         <div className="flex items-center gap-2">
+          {/* Saved Dataset Credentials View Button */}
+          <button
+            onClick={openCredentialsModal}
+            title="Inspect Saved Credentials in Dataset"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal hover:text-accent hover:border-accent/40 shadow-soft transition-all duration-200"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-accent" />
+            <span className="font-medium">Saved Users</span>
+          </button>
+
+          {/* User Auth State / Sign In Button */}
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-2 bg-surface border border-taupe/20 rounded-xl px-2.5 py-1 shadow-soft">
+              <div className="w-6 h-6 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs">
+                {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+              </div>
+              <div className="hidden xl:flex flex-col text-left leading-none">
+                <span className="text-xs font-semibold text-text-main truncate max-w-[110px]">
+                  {user.full_name || 'Analyst'}
+                </span>
+                <span className="text-[10px] text-taupe capitalize font-mono">
+                  {user.provider === 'gmail' ? 'Gmail' : user.provider}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign Out"
+                className="p-1 rounded-lg text-taupe hover:text-alert-red hover:bg-alert-red/10 transition-colors ml-1"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={openLoginModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent hover:bg-terracotta text-white font-medium text-xs tracking-wide shadow-soft transition-all duration-200"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
+
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}

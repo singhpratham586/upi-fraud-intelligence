@@ -6,7 +6,9 @@ import type {
   BusinessImpactSimResponse,
   SQLQueryItem,
   SQLQueryResult,
-  Investigation
+  Investigation,
+  AuthResponse,
+  StoredCredentialRecord
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -125,4 +127,24 @@ export const api = {
   getSQLQueries: () => fetchJson<SQLQueryItem[]>('/sql-insights'),
 
   executeSQLQuery: (queryId: number) => fetchJson<SQLQueryResult>(`/sql-insights/${queryId}/execute`),
+
+  // Authentication & Dataset Credentials
+  loginWithGmail: (email: string, password: string, fullName?: string) =>
+    fetchJson<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, full_name: fullName }),
+    }),
+
+  loginWithOAuth: (provider: 'google' | 'github', email: string, fullName: string, avatarUrl?: string) =>
+    fetchJson<AuthResponse>('/auth/oauth', {
+      method: 'POST',
+      body: JSON.stringify({ provider, email, full_name: fullName, avatar_url: avatarUrl }),
+    }),
+
+  getSavedUsers: () => fetchJson<StoredCredentialRecord[]>('/auth/users'),
+
+  logout: () =>
+    fetchJson<{ success: boolean; message: string }>('/auth/logout', {
+      method: 'POST',
+    }),
 };

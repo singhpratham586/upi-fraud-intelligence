@@ -419,6 +419,26 @@ GROUP BY observation_period
 ORDER BY observation_period ASC;""",
         "explanation": "Executes period-over-period drift analysis to evaluate whether fraud frequency or volume is accelerating over time.",
         "expected_interpretation": "Allows risk leadership to evaluate macroeconomic or attacker behavioral drifts over time."
+    },
+    {
+        "id": 21,
+        "title": "Saved Analyst Credentials & Authentication Audit Log",
+        "category": "Security & Audit",
+        "dashboard_link": "/sql-insights",
+        "business_question": "Which analyst accounts and login credentials have been saved in the platform dataset?",
+        "sql": """SELECT 
+    id,
+    email,
+    provider,
+    full_name,
+    role,
+    login_count,
+    last_login_at,
+    created_at
+FROM users
+ORDER BY last_login_at DESC;""",
+        "explanation": "Audits all authenticated platform operators and risk analysts saved in the PostgreSQL/SQLite user table.",
+        "expected_interpretation": "Tracks platform operator credentials, primary Gmail logins vs Google/GitHub OAuth, and active investigator sessions."
     }
 ]
 
