@@ -6,11 +6,12 @@ import {
 import {
   RotateCcw, Filter, AlertTriangle, ShieldCheck, DollarSign,
   TrendingUp, Activity, HelpCircle, ArrowUpRight, CheckCircle2,
-  Info
+  Info, FileSpreadsheet, ChevronDown, ChevronUp, Eye
 } from 'lucide-react';
 import { api } from '../services/api';
-import { DashboardData } from '../types';
+import { DashboardData, SheetPreviewTransaction, EvaluateSheetResponse } from '../types';
 import { useTheme } from '../context/ThemeContext';
+import { FileDropZone } from '../components/FileDropZone';
 
 export const DashboardPage: React.FC = () => {
   const { theme } = useTheme();
@@ -21,6 +22,23 @@ export const DashboardPage: React.FC = () => {
   // Filters
   const [category, setCategory] = useState<string>('all');
   const [riskLevel, setRiskLevel] = useState<string>('all');
+
+  // Sheet Evaluation State
+  const [activeSheetName, setActiveSheetName] = useState<string | null>(null);
+  const [sheetPreviewTxns, setSheetPreviewTxns] = useState<SheetPreviewTransaction[]>([]);
+  const [isDropzoneExpanded, setIsDropzoneExpanded] = useState<boolean>(true);
+
+  const handleSheetEvaluated = (result: EvaluateSheetResponse) => {
+    setData(result.dashboard_data);
+    setActiveSheetName(result.filename);
+    setSheetPreviewTxns(result.preview_transactions);
+  };
+
+  const handleResetToBaseline = () => {
+    setActiveSheetName(null);
+    setSheetPreviewTxns([]);
+    fetchData();
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -153,8 +171,33 @@ export const DashboardPage: React.FC = () => {
               <span>Reset</span>
             </button>
           )}
+
+          {/* Toggle Drop Zone Button */}
+          <button
+            onClick={() => setIsDropzoneExpanded(!isDropzoneExpanded)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all shadow-soft ${
+              isDropzoneExpanded || activeSheetName
+                ? 'bg-accent/15 border-accent text-accent'
+                : 'bg-surface border-taupe/20 text-charcoal hover:border-accent/40'
+            }`}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>{activeSheetName ? 'Active Sheet' : 'Drop Excel / Sheet'}</span>
+            {isDropzoneExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
         </div>
       </div>
+
+      {/* File Drop Area / Sheet Evaluator Drop Box */}
+      {isDropzoneExpanded && (
+        <div className="animate-in fade-in duration-200">
+          <FileDropZone
+            onEvaluated={handleSheetEvaluated}
+            onReset={handleResetToBaseline}
+            activeSheetName={activeSheetName}
+          />
+        </div>
+      )}
 
       {/* KPI Cards Strip (6 Essential Metrics) */}
       {kpis && (
@@ -462,6 +505,100 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Evaluated Sheet Forensic Preview Table */}
+      {sheetPreviewTxns.length > 0 && (
+        <div className="p-6 rounded-2xl bg-surface border border-taupe/20 shadow-soft space-y-4 animate-in fade-in duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-taupe/15">
+            <div>
+              <span className="text-[10px] font-mono uppercase bg-accent/15 text-accent px-1.5 py-0.5 rounded font-bold">
+                FORENSIC PREVIEW
+              </span>
+              <h3 className="font-bold text-base text-text-main mt-1">
+                Evaluated Sheet Transactions ({sheetPreviewTxns.length} Anomaly Samples)
+              </h3>
+              <p className="text-xs text-taupe">
+                Dynamic risk scores and anomaly signals computed live across your uploaded spreadsheet.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-taupe font-mono">Source: {activeSheetName}</span>
+            </div>
+          </div>
+
+          <div className="border border-taupe/20 rounded-xl overflow-x-auto bg-background/50">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-surface/80 border-b border-taupe/20 font-mono text-[11px] text-taupe">
+                <tr>
+                  <th className="py-2.5 px-3">Txn ID</th>
+                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-2.5 px-3">Sender</th>
+                  <th className="py-2.5 px-3">Receiver</th>
+                  <th className="py-2.5 px-3">Category</th>
+                  <th className="py-2.5 px-3 text-right">Amount (₹)</th>
+                  <th className="py-2.5 px-3">Risk Score</th>
+                  <th className="py-2.5 px-3">Risk Tier</th>
+                  <th className="py-2.5 px-3">Detected Signals</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-taupe/15">
+                {sheetPreviewTxns.map((t) => (
+                  <tr key={t.id} className="hover:bg-surface/60 transition-colors">
+                    <td className="py-2 px-3 font-mono text-accent font-medium">{t.id}</td>
+                    <td className="py-2 px-3 font-mono text-taupe whitespace-nowrap">
+                      {new Date(t.timestamp).toLocaleDateString()} {new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="py-2 px-3 text-charcoal">{t.sender_name}</td>
+                    <td className="py-2 px-3 text-charcoal">{t.receiver_name}</td>
+                    <td className="py-2 px-3 font-mono text-[11px] text-taupe capitalize">
+                      {t.merchant_category.replace(/_/g, ' ')}
+                    </td>
+                    <td className="py-2 px-3 font-mono font-bold text-text-main text-right">
+                      ₹{t.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="py-2 px-3 font-mono font-bold text-text-main">
+                      <span className={t.risk_score >= 65 ? 'text-alert-red' : t.risk_score >= 35 ? 'text-accent' : 'text-sage'}>
+                        {t.risk_score}/100
+                      </span>
+                    </td>
+                    <td className="py-2 px-3">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                          t.risk_level === 'CRITICAL'
+                            ? 'bg-alert-red/20 text-alert-red border border-alert-red/30'
+                            : t.risk_level === 'HIGH'
+                            ? 'bg-accent/20 text-accent border border-accent/30'
+                            : t.risk_level === 'MEDIUM'
+                            ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                            : 'bg-sage/20 text-sage border border-sage/30'
+                        }`}
+                      >
+                        {t.risk_level}
+                      </span>
+                    </td>
+                    <td className="py-2 px-3">
+                      <div className="flex flex-wrap gap-1">
+                        {t.signals && t.signals.length > 0 ? (
+                          t.signals.map((sig, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-surface border border-taupe/20 text-taupe"
+                            >
+                              {sig}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[10px] text-taupe italic">Baseline Normal</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

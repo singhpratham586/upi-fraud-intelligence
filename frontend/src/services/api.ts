@@ -8,7 +8,8 @@ import type {
   SQLQueryResult,
   Investigation,
   AuthResponse,
-  StoredCredentialRecord
+  StoredCredentialRecord,
+  EvaluateSheetResponse
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -147,4 +148,18 @@ export const api = {
     fetchJson<{ success: boolean; message: string }>('/auth/logout', {
       method: 'POST',
     }),
+
+  // Sheet & Excel Drop Evaluation
+  evaluateSheet: (payload: {
+    filename: string;
+    file_base64?: string;
+    csv_text?: string;
+    persist_to_db?: boolean;
+  }) =>
+    fetchJson<EvaluateSheetResponse>('/datasets/evaluate-sheet', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  getSampleSheetUrl: () => `${BASE_URL}/datasets/sample-sheet`,
 };

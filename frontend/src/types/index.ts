@@ -268,3 +268,31 @@ export interface StoredCredentialRecord {
   last_login_at: string;
   created_at: string;
 }
+
+export interface SheetPreviewTransaction {
+  id: string;
+  timestamp: string;
+  sender_id: string;
+  sender_name: string;
+  receiver_id: string;
+  receiver_name: string;
+  merchant_category: string;
+  amount: number;
+  status: string;
+  risk_score: number;
+  risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  signals: string[];
+  location_city: string;
+  device_type: string;
+}
+
+export interface EvaluateSheetResponse {
+  status: string;
+  filename: string;
+  total_records: number;
+  mapped_columns: Record<string, string>;
+  dashboard_data: DashboardData;
+  preview_transactions: SheetPreviewTransaction[];
+  persisted_to_db: boolean;
+  execution_time_ms: number;
+}
