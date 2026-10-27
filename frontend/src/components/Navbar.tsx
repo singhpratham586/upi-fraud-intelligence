@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Database, Layers, TrendingUp, Search, BookOpen, Sun, Moon, LogIn, LogOut, KeyRound, UserCheck } from 'lucide-react';
+import {
+  BarChart3, Database, Layers, TrendingUp, Search, BookOpen,
+  Sun, Moon, LogIn, LogOut, KeyRound, UserCheck, Share2, Sliders, BellRing
+} from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,9 +15,12 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { path: '/dashboard', label: 'Overview', icon: BarChart3 },
     { path: '/transactions', label: 'Transactions', icon: Search },
+    { path: '/network', label: 'Network', icon: Share2 },
+    { path: '/playground', label: 'Playground', icon: Sliders },
+    { path: '/alerts', label: 'Alerts', icon: BellRing },
     { path: '/detection-lab', label: 'Detection Lab', icon: Layers },
-    { path: '/business-impact', label: 'Business Impact', icon: TrendingUp },
-    { path: '/sql-insights', label: 'SQL Insights', icon: Database },
+    { path: '/business-impact', label: 'Impact', icon: TrendingUp },
+    { path: '/sql-insights', label: 'SQL', icon: Database },
     { path: '/methodology', label: 'Methodology', icon: BookOpen },
   ];
 

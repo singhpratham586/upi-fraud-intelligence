@@ -118,9 +118,9 @@ $$\text{Net Benefit} = (\text{Detected Fraud Value} \times \text{Recovery Rate})
 
 ---
 
-## 7. SQL Query Studio (20+ Production Queries)
+## 7. SQL Query Studio (26 Production Queries)
 
-The system includes a production query catalog covering 20 essential financial analytics questions:
+The system includes a production query catalog covering 26 essential financial analytics questions:
 1. Total Transaction Volume & Throughput
 2. Aggregate Transaction Value & Average Ticket Size
 3. Daily Transaction Velocity & Value Trends
@@ -142,10 +142,36 @@ The system includes a production query catalog covering 20 essential financial a
 19. Precision, Recall, and Ground-Truth Confusion Metrics
 20. Bi-Weekly Period-over-Period Risk Shift
 21. Saved Analyst Credentials & Authentication Audit Log (`users` table)
+22. Money Mule In-Degree Funneling & Aggregation Syndicate Analysis
+23. High-Net-Worth Legitimate Spender Divergence (False-Alarm Mitigation)
+24. Investigation Queue Resolution Status & Workload Distribution
+25. Sender Account Spend Velocity & Micro-Probe Drain Clusters
+26. Geographic Transit Velocity & Impossible Metro Hop Audit
 
 ---
 
-## 8. Authentication & Dataset Credential Persistence
+## 8. Advanced Feature Modules
+
+### Interactive Transaction Network Explorer (`/network`)
+- Graph-based topological mapping of senders, merchants, and beneficiary hubs.
+- Automatic in-degree centrality calculation to highlight suspected money-mule pooling funnels.
+- Node selection with connected transfer drill-downs and edge risk weighting.
+- Dynamic pan/zoom with static 2D canvas fallback.
+
+### What-If Detection Parameter Playground (`/playground`)
+- Safe simulation sandbox allowing risk analysts to manipulate transaction values, pacing deltas, and device fingerprints.
+- Realtime model re-execution with calibrated ensemble risk scoring (0–100).
+- **Explainable Feature Attribution Waterfall**: Exact point contributions explaining why an event tripped high or critical risk thresholds.
+- Zero contamination guarantee: Simulations never mutate the underlying baseline database.
+
+### Operational Alert Center & SLA Triage Desk (`/alerts`)
+- Dedicated alert prioritization desk sorted by ensemble risk score and SLA urgency.
+- Human review status transitions (`New` -> `Under Review` -> `Reviewed` -> `Escalated` -> `Closed`).
+- Audit event trail persisted to PostgreSQL/SQLite table (`audit_events`).
+
+---
+
+## 9. Authentication & Dataset Credential Persistence
 
 The platform includes an enterprise analyst authentication system integrated directly into the persistent dataset:
 

@@ -1,12 +1,14 @@
 import pytest
 from app.database import SessionLocal
 from app.routers.analytics import get_overview_metrics, get_full_dashboard
-from app.routers.transactions import list_transactions, get_transaction_detail
+from app.routers.transactions import list_transactions, get_transaction_detail, get_transaction_network_graph
 from app.routers.investigations import update_transaction_investigation
 from app.routers.sql_insights import get_sql_query_catalog, run_sql_query
 from app.routers.business_impact import simulate_impact
+from app.routers.scenarios import simulate_what_if_scenario
 from app.schemas.transaction import InvestigationUpdate
 from app.schemas.business_impact import BusinessImpactSimRequest
+from app.schemas.scenario import WhatIfRequest
 
 @pytest.fixture(scope="module")
 def db_session():
@@ -101,3 +103,27 @@ def test_api_business_impact_simulation(db_session):
     assert res.investigation_workload_alerts > 0
     assert res.estimated_loss_avoided > 0
     assert len(res.tradeoff_curve) > 5
+
+def test_api_network_graph(db_session):
+    graph = get_transaction_network_graph(limit=30, risk_level=None, min_amount=None, category=None, focus_mules=False, db=db_session)
+    assert graph.summary.total_nodes > 0
+    assert graph.summary.total_edges > 0
+    assert len(graph.nodes) == graph.summary.total_nodes
+    assert len(graph.edges) == graph.summary.total_edges
+
+def test_api_what_if_scenario(db_session):
+    req = WhatIfRequest(
+        amount=85000.0,
+        time_since_last_txn_sec=60.0,
+        rolling_count_1h=5,
+        merchant_category="crypto_p2p_simulation",
+        is_device_changed=True,
+        is_location_changed=True,
+        user_historical_mean=2000.0,
+        user_historical_std=500.0
+    )
+    res = simulate_what_if_scenario(req=req, db=db_session)
+    assert res.modified.ensemble_risk_score >= 50.0
+    assert res.modified.risk_level in ["HIGH", "CRITICAL"]
+    assert len(res.attribution) >= 3
+    assert len(res.modified.detection_signals) >= 2

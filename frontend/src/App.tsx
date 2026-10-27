@@ -9,6 +9,9 @@ import { SavedCredentialsModal } from './components/SavedCredentialsModal';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TransactionsPage } from './pages/TransactionsPage';
+import { NetworkGraphPage } from './pages/NetworkGraphPage';
+import { WhatIfPlaygroundPage } from './pages/WhatIfPlaygroundPage';
+import { AlertCenterPage } from './pages/AlertCenterPage';
 import { DetectionLabPage } from './pages/DetectionLabPage';
 import { BusinessImpactPage } from './pages/BusinessImpactPage';
 import { SQLInsightsPage } from './pages/SQLInsightsPage';
@@ -26,6 +29,9 @@ export const App: React.FC = () => {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/transactions" element={<TransactionsPage />} />
+                <Route path="/network" element={<NetworkGraphPage />} />
+                <Route path="/playground" element={<WhatIfPlaygroundPage />} />
+                <Route path="/alerts" element={<AlertCenterPage />} />
                 <Route path="/detection-lab" element={<DetectionLabPage />} />
                 <Route path="/business-impact" element={<BusinessImpactPage />} />
                 <Route path="/sql-insights" element={<SQLInsightsPage />} />

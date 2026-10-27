@@ -9,7 +9,10 @@ import type {
   Investigation,
   AuthResponse,
   StoredCredentialRecord,
-  EvaluateSheetResponse
+  EvaluateSheetResponse,
+  NetworkGraphResponse,
+  WhatIfResponse,
+  AuditEvent
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -162,4 +165,42 @@ export const api = {
     }),
 
   getSampleSheetUrl: () => `${BASE_URL}/datasets/sample-sheet`,
+
+  // Transaction Network Graph
+  getNetworkGraph: (params?: {
+    limit?: number;
+    risk_level?: string;
+    min_amount?: number;
+    category?: string;
+    focus_mules?: boolean;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.limit) query.append('limit', params.limit.toString());
+    if (params?.risk_level && params.risk_level !== 'all') query.append('risk_level', params.risk_level);
+    if (params?.min_amount) query.append('min_amount', params.min_amount.toString());
+    if (params?.category && params.category !== 'all') query.append('category', params.category);
+    if (params?.focus_mules) query.append('focus_mules', 'true');
+    return fetchJson<NetworkGraphResponse>(`/transactions/network-graph?${query.toString()}`);
+  },
+
+  // What-If Detection Scenario Simulator
+  simulateWhatIf: (payload: {
+    transaction_id?: string;
+    amount: number;
+    time_since_last_txn_sec: number;
+    rolling_count_1h: number;
+    merchant_category: string;
+    is_device_changed: boolean;
+    is_location_changed: boolean;
+    user_historical_mean: number;
+    user_historical_std: number;
+  }) =>
+    fetchJson<WhatIfResponse>('/scenarios/simulate-what-if', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  // Audit Trail
+  getAuditTrail: (transactionId: string) =>
+    fetchJson<AuditEvent[]>(`/transactions/${transactionId}/audit-trail`),
 };

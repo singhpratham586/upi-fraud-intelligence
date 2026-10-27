@@ -107,3 +107,18 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_provider ON users(provider);
+
+CREATE TABLE IF NOT EXISTS audit_events (
+    id SERIAL PRIMARY KEY,
+    transaction_id VARCHAR(64) NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    previous_status VARCHAR(32),
+    new_status VARCHAR(32),
+    analyst_id VARCHAR(64) NOT NULL DEFAULT 'analyst_01',
+    analyst_name VARCHAR(128) DEFAULT 'Lead Risk Analyst',
+    details TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_txn ON audit_events(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_events(created_at DESC);

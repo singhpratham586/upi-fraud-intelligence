@@ -439,6 +439,115 @@ FROM users
 ORDER BY last_login_at DESC;""",
         "explanation": "Audits all authenticated platform operators and risk analysts saved in the PostgreSQL/SQLite user table.",
         "expected_interpretation": "Tracks platform operator credentials, primary Gmail logins vs Google/GitHub OAuth, and active investigator sessions."
+    },
+    {
+        "id": 22,
+        "title": "Money Mule In-Degree Funneling & Aggregation Syndicate Analysis",
+        "category": "Syndicate Detection",
+        "dashboard_link": "/transactions",
+        "business_question": "Which beneficiary accounts exhibit money-mule characteristics by receiving rapid transfers from multiple distinct payers?",
+        "sql": """SELECT 
+    receiver_id,
+    receiver_name,
+    COUNT(DISTINCT sender_id) AS distinct_payer_sources,
+    COUNT(*) AS total_received_transfers,
+    ROUND(SUM(amount), 2) AS total_settled_inr,
+    ROUND(AVG(amount), 2) AS avg_transfer_inr,
+    SUM(CASE WHEN is_fraud_simulated = 1 THEN 1 ELSE 0 END) AS simulated_mule_flags,
+    ROUND(SUM(CASE WHEN is_fraud_simulated = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS mule_risk_rate_pct
+FROM transactions
+GROUP BY receiver_id, receiver_name
+HAVING COUNT(DISTINCT sender_id) >= 5
+ORDER BY distinct_payer_sources DESC, total_settled_inr DESC
+LIMIT 15;""",
+        "explanation": "Quantifies network in-degree to identify centralized recipient funnels receiving fragmented micro-transfers from disjoint accounts.",
+        "expected_interpretation": "High in-degree accounts with dispersed senders are prime candidates for money mule pooling networks."
+    },
+    {
+        "id": 23,
+        "title": "High-Net-Worth Legitimate Spender Divergence (False-Alarm Mitigation)",
+        "category": "Model Performance",
+        "dashboard_link": "/detection-lab",
+        "business_question": "How frequently do high-income legitimate spenders trigger univariate statistical outliers (IQR) without committing fraud?",
+        "sql": """SELECT 
+    t.sender_id,
+    t.sender_name,
+    ROUND(AVG(t.amount), 2) AS user_avg_spend_inr,
+    ROUND(MAX(t.amount), 2) AS peak_ticket_inr,
+    COUNT(*) AS total_payments,
+    SUM(CASE WHEN d.iqr_flag = 1 AND t.is_fraud_simulated = 0 THEN 1 ELSE 0 END) AS false_positive_iqr_alerts,
+    ROUND(SUM(CASE WHEN d.iqr_flag = 1 AND t.is_fraud_simulated = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS false_alarm_rate_pct
+FROM transactions t
+JOIN detection_results d ON t.id = d.transaction_id
+GROUP BY t.sender_id, t.sender_name
+HAVING AVG(t.amount) >= 15000.0
+ORDER BY user_avg_spend_inr DESC
+LIMIT 15;""",
+        "explanation": "Correlates high-ticket spending profiles against univariate statistical bounds to isolate where naive IQR thresholding over-alerts on affluent customers.",
+        "expected_interpretation": "Demonstrates why personalized user baselines and multivariate Isolation Forest models are necessary to avoid frustrating premium banking clients."
+    },
+    {
+        "id": 24,
+        "title": "Investigation Queue Resolution Status & Workload Distribution",
+        "category": "Operational Workload",
+        "dashboard_link": "/transactions",
+        "business_question": "What is the operational distribution of cases across New, Under Review, Reviewed, and Escalated tiers?",
+        "sql": """SELECT 
+    review_status,
+    COUNT(*) AS total_cases,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM investigations), 2) AS workload_distribution_pct,
+    COUNT(analyst_notes) AS cases_with_notes,
+    COUNT(DISTINCT analyst_id) AS active_investigators
+FROM investigations
+GROUP BY review_status
+ORDER BY total_cases DESC;""",
+        "explanation": "Summarizes the human investigation queue balance to evaluate investigator backlog and escalation rates.",
+        "expected_interpretation": "Helps risk operations leadership allocate capacity and monitor review turnaround times."
+    },
+    {
+        "id": 25,
+        "title": "Sender Account Spend Velocity & Micro-Probe Drain Clusters",
+        "category": "Velocity Profiling",
+        "dashboard_link": "/transactions",
+        "business_question": "Which account holders demonstrate anomalous rapid-succession transfer bursts indicative of account takeover draining?",
+        "sql": """SELECT 
+    sender_id,
+    sender_name,
+    COUNT(*) AS total_transfers,
+    ROUND(SUM(amount), 2) AS cumulative_drain_inr,
+    ROUND(AVG(time_since_last_txn_sec), 1) AS avg_inter_transaction_seconds,
+    SUM(CASE WHEN time_since_last_txn_sec <= 180 THEN 1 ELSE 0 END) AS rapid_burst_count
+FROM transactions
+WHERE time_since_last_txn_sec > 0
+GROUP BY sender_id, sender_name
+HAVING COUNT(*) >= 10 AND AVG(time_since_last_txn_sec) <= 900
+ORDER BY rapid_burst_count DESC, cumulative_drain_inr DESC
+LIMIT 15;""",
+        "explanation": "Screens for short inter-transaction deltas (<= 3 minutes) clustered together, signaling automated API bots or account takeovers.",
+        "expected_interpretation": "High rapid burst counts indicate mechanical draining where fraudsters attempt to empty a balance before an account holder notices."
+    },
+    {
+        "id": 26,
+        "title": "Geographic Transit Velocity & Impossible Metro Hop Audit",
+        "category": "Geospatial Risk",
+        "dashboard_link": "/transactions",
+        "business_question": "Which transactions involve consecutive cross-city metro hops occurring too rapidly for commercial physical travel?",
+        "sql": """SELECT 
+    id,
+    sender_id,
+    location_city AS current_city,
+    device_type,
+    amount,
+    time_since_last_txn_sec,
+    is_location_changed,
+    is_device_changed,
+    is_fraud_simulated
+FROM transactions
+WHERE is_location_changed = 1 AND time_since_last_txn_sec <= 1800
+ORDER BY time_since_last_txn_sec ASC
+LIMIT 20;""",
+        "explanation": "Identifies consecutive events originating from distinct metro cities within 30 minutes, violating physical travel constraints.",
+        "expected_interpretation": "Strong signal of credential sharing, concurrent sessions from multiple actors, or proxy/VPN location spoofing."
     }
 ]
 

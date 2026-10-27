@@ -19,7 +19,7 @@ export interface DetectionResult {
 export interface Investigation {
   id: number;
   transaction_id: string;
-  review_status: 'New' | 'Under Review' | 'Reviewed' | 'Escalated';
+  review_status: 'New' | 'Under Review' | 'Reviewed' | 'Escalated' | 'Closed';
   analyst_notes?: string | null;
   analyst_id?: string | null;
   escalation_reason?: string | null;
@@ -295,4 +295,87 @@ export interface EvaluateSheetResponse {
   preview_transactions: SheetPreviewTransaction[];
   persisted_to_db: boolean;
   execution_time_ms: number;
+}
+
+export interface NetworkNode {
+  id: string;
+  label: string;
+  type: 'sender' | 'receiver' | 'merchant';
+  risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  transaction_count: number;
+  total_amount: number;
+  is_mule_suspect: boolean;
+  city?: string | null;
+  category?: string | null;
+}
+
+export interface NetworkEdge {
+  id: string;
+  source: string;
+  target: string;
+  transaction_id: string;
+  amount: number;
+  timestamp: string;
+  risk_score: number;
+  risk_level: string;
+  signals: string[];
+  status: string;
+}
+
+export interface NetworkGraphSummary {
+  total_nodes: number;
+  total_edges: number;
+  total_volume_inr: number;
+  mule_suspect_nodes: number;
+  high_or_critical_edges: number;
+}
+
+export interface NetworkGraphResponse {
+  nodes: NetworkNode[];
+  edges: NetworkEdge[];
+  summary: NetworkGraphSummary;
+}
+
+export interface FeatureAttribution {
+  factor: string;
+  points: number;
+  description: string;
+}
+
+export interface DetectorOutput {
+  iqr_flag: boolean;
+  iqr_score: number;
+  iqr_reason: string;
+  iforest_flag: boolean;
+  iforest_score: number;
+  iforest_reason: string;
+  timeseries_flag: boolean;
+  timeseries_score: number;
+  timeseries_reason: string;
+  ensemble_risk_score: number;
+  risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  detection_signals: string[];
+}
+
+export interface WhatIfResponse {
+  original_id?: string | null;
+  original?: DetectorOutput | null;
+  modified: DetectorOutput;
+  score_delta: number;
+  new_signals: string[];
+  cleared_signals: string[];
+  explanation: string;
+  attribution: FeatureAttribution[];
+}
+
+export interface AuditEvent {
+  id: number;
+  transaction_id: string;
+  action: string;
+  previous_status?: string | null;
+  new_status?: string | null;
+  analyst_id: string;
+  analyst_name?: string | null;
+  details?: string | null;
+  created_at: string;
 }
