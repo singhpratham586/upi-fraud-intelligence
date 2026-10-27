@@ -24,7 +24,7 @@ export const App: React.FC = () => {
         <Router>
           <div className="min-h-screen flex flex-col bg-background text-text-main font-sans selection:bg-accent selection:text-white transition-colors duration-200">
             <Navbar />
-            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-8">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
