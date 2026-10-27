@@ -28,7 +28,7 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 w-full border-b border-taupe/20 bg-background/90 backdrop-blur-md">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link to="/" className="flex items-center gap-2.5 group">
+        <Link to="/" className="btn-wobble flex items-center gap-2.5 group">
           <img
             src="/brand-icon.jpg"
             alt="UPI Fraud Intelligence Logo"
@@ -56,7 +56,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-all ${
+                className={`btn-wobble flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-charcoal text-surface shadow-soft'
                     : 'text-charcoal/80 hover:text-text-main hover:bg-surface/60'
@@ -127,7 +127,7 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft">
+          <div className="btn-wobble cursor-default hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft">
             <span className="w-2 h-2 rounded-full bg-sage animate-pulse" />
             <span>PostgreSQL Active</span>
           </div>
