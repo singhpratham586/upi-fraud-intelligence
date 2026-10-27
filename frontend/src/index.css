@@ -33,12 +33,14 @@
     --color-grain: rgba(255, 255, 255, 0.035);
   }
 
-  body {
+  html, body {
     background-color: rgb(var(--color-background-rgb));
     color: rgb(var(--color-text-main-rgb));
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     transition: background-color 0.2s ease, color 0.2s ease;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   .font-tabular {

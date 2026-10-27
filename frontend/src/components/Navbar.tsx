@@ -26,9 +26,9 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-taupe/20 bg-background/90 backdrop-blur-md">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 h-16 flex items-center justify-between">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link to="/" className="btn-wobble flex items-center gap-2.5 group">
+        <Link to="/" className="btn-wobble flex items-center gap-2.5 group shrink-0">
           <img
             src="/brand-icon.jpg"
             alt="UPI Fraud Intelligence Logo"
@@ -41,14 +41,14 @@ export const Navbar: React.FC = () => {
                 PROD
               </span>
             </span>
-            <span className="hidden sm:block text-[11px] text-taupe leading-none">
+            <span className="hidden xl:block text-[11px] text-taupe leading-none">
               Transaction Risk Analytics Platform
             </span>
           </div>
         </Link>
 
         {/* Navigation items */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.path;
@@ -56,39 +56,29 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`btn-wobble flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-all ${
+                className={`btn-wobble flex items-center gap-1 xl:gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-charcoal text-surface shadow-soft'
                     : 'text-charcoal/80 hover:text-text-main hover:bg-surface/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
-                {link.label}
+                <span>{link.label}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Status Indicator, Auth Controls & Theme Toggle */}
-        <div className="flex items-center gap-2">
-          {/* Saved Dataset Credentials View Button */}
-          <button
-            onClick={openCredentialsModal}
-            title="Inspect Saved Credentials in Dataset"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal hover:text-accent hover:border-accent/40 shadow-soft transition-all duration-200"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-accent" />
-            <span className="font-medium">Saved Users</span>
-          </button>
-
+        <div className="flex items-center gap-2 shrink-0">
           {/* User Auth State / Sign In Button */}
           {isAuthenticated && user ? (
             <div className="flex items-center gap-2 bg-surface border border-taupe/20 rounded-xl px-2.5 py-1 shadow-soft">
               <div className="w-6 h-6 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs">
                 {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
               </div>
-              <div className="hidden xl:flex flex-col text-left leading-none">
-                <span className="text-xs font-semibold text-text-main truncate max-w-[110px]">
+              <div className="hidden sm:flex flex-col text-left leading-none">
+                <span className="text-xs font-semibold text-text-main truncate max-w-[90px] xl:max-w-[130px]">
                   {user.full_name || 'Analyst'}
                 </span>
                 <span className="text-[10px] text-taupe capitalize font-mono">
@@ -127,7 +117,7 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          <div className="btn-wobble cursor-default hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft">
+          <div className="btn-wobble cursor-default hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft">
             <span className="w-2 h-2 rounded-full bg-sage animate-pulse" />
             <span>PostgreSQL Active</span>
           </div>

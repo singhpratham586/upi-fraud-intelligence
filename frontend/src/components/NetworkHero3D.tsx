@@ -141,12 +141,12 @@ export const NetworkHero3D: React.FC = () => {
   // Fallback 2D visual for reduced motion or non-WebGL systems
   if (!hasWebGL || prefersReducedMotion) {
     return (
-      <div className="w-full h-[420px] sm:h-[480px] lg:h-[540px] xl:h-[580px] rounded-2xl bg-surface border border-taupe/20 p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-soft">
+      <div className="w-full h-[360px] sm:h-[400px] lg:h-[440px] xl:h-[460px] rounded-2xl bg-surface border border-taupe/20 p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-soft">
         <div className="absolute inset-0 bg-grain pointer-events-none" />
         <img
           src="/brand-icon.jpg"
           alt="UPI Fraud Spatial Signal"
-          className="w-36 h-36 rounded-2xl object-cover shadow-elevated border border-accent/40 mb-4"
+          className="w-32 h-32 rounded-2xl object-cover shadow-elevated border border-accent/40 mb-3"
         />
         <p className="font-semibold text-text-main text-sm">UPI Transaction Graph Signal</p>
         <p className="text-taupe text-xs max-w-xs text-center mt-1">
@@ -157,7 +157,7 @@ export const NetworkHero3D: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-[420px] sm:h-[480px] lg:h-[540px] xl:h-[580px] rounded-2xl bg-surface/80 border border-taupe/20 relative overflow-hidden shadow-elevated">
+    <div className="w-full h-[360px] sm:h-[400px] lg:h-[440px] xl:h-[460px] rounded-2xl bg-surface/80 border border-taupe/20 relative overflow-hidden shadow-elevated">
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/90 backdrop-blur border border-taupe/20 text-[11px] text-charcoal">
         <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
         <span className="font-mono font-medium">3D Topology • Realtime Spatial Signals</span>

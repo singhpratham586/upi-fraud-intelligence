@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-taupe/20 bg-surface/50 mt-16 text-charcoal/80 text-xs">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-10">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Col 1 */}
           <div className="space-y-3 md:col-span-1">

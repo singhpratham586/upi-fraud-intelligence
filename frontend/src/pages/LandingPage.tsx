@@ -18,62 +18,62 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* Hero Section */}
-      <section className="relative pt-4 sm:pt-8 lg:pt-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
+      <section className="relative pt-2 sm:pt-6 lg:pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Hero Left Content */}
-          <div className="lg:col-span-7 xl:col-span-6 space-y-6">
+          <div className="lg:col-span-7 xl:col-span-6 space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/25 text-accent text-xs font-semibold">
               <img src="/brand-icon.jpg" alt="Icon" className="w-4 h-4 rounded-full object-cover" />
               FINTECH RISK ANALYTICS PORTFOLIO
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-text-main font-editorial leading-[1.08]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-main font-editorial leading-[1.12]">
               See the Signals Behind Suspicious Transactions.
             </h1>
 
-            <p className="text-base sm:text-lg text-charcoal/80 max-w-2xl font-normal leading-relaxed">
+            <p className="text-sm sm:text-base text-charcoal/80 max-w-xl font-normal leading-relaxed">
               An analytical intelligence platform for exploring transaction behavior, detecting anomalies,
               and understanding financial risk across synthetic UPI payment networks.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <Link
                 to="/dashboard"
-                className="btn-wobble flex items-center gap-2 px-6 py-3 rounded-xl bg-accent hover:bg-accent-dark text-white font-semibold text-sm transition-all shadow-soft"
+                className="btn-wobble flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-dark text-white font-semibold text-sm transition-all shadow-soft"
               >
                 <span>Explore Analytics</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/methodology"
-                className="btn-wobble flex items-center gap-2 px-6 py-3 rounded-xl bg-surface border border-taupe/30 hover:border-charcoal/40 text-charcoal font-semibold text-sm transition-all shadow-soft"
+                className="btn-wobble flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-taupe/30 hover:border-charcoal/40 text-charcoal font-semibold text-sm transition-all shadow-soft"
               >
                 <span>View Methodology</span>
               </Link>
             </div>
 
             {/* Demonstration Key Metric Badges */}
-            <div className="pt-6 border-t border-taupe/20 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 rounded-xl bg-surface/70 border border-taupe/15">
-                <span className="text-[11px] text-taupe block uppercase font-mono">Analyzed Dataset</span>
-                <span className="text-xl lg:text-2xl font-bold font-tabular text-text-main">12,423</span>
-                <span className="text-[10px] text-taupe block">UPI Transactions</span>
+            <div className="pt-5 border-t border-taupe/20 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-surface/70 border border-taupe/15">
+                <span className="text-[10px] text-taupe block uppercase font-mono">Analyzed Dataset</span>
+                <span className="text-lg sm:text-xl font-bold font-tabular text-text-main">12,423</span>
+                <span className="text-[10px] text-taupe block truncate">UPI Transactions</span>
               </div>
-              <div className="p-3 rounded-xl bg-surface/70 border border-taupe/15">
-                <span className="text-[11px] text-taupe block uppercase font-mono">Gross Volume</span>
-                <span className="text-xl lg:text-2xl font-bold font-tabular text-text-main">₹57.8M</span>
-                <span className="text-[10px] text-taupe block">Synthetic Settlements</span>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-surface/70 border border-taupe/15">
+                <span className="text-[10px] text-taupe block uppercase font-mono">Gross Volume</span>
+                <span className="text-lg sm:text-xl font-bold font-tabular text-text-main">₹57.8M</span>
+                <span className="text-[10px] text-taupe block truncate">Synthetic Volume</span>
               </div>
-              <div className="p-3 rounded-xl bg-surface/70 border border-taupe/15">
-                <span className="text-[11px] text-taupe block uppercase font-mono">Detection Lab</span>
-                <span className="text-xl lg:text-2xl font-bold font-tabular text-text-main">3 Models</span>
-                <span className="text-[10px] text-taupe block">IQR • IForest • Velocity</span>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-surface/70 border border-taupe/15">
+                <span className="text-[10px] text-taupe block uppercase font-mono">Detection Lab</span>
+                <span className="text-lg sm:text-xl font-bold font-tabular text-text-main">3 Models</span>
+                <span className="text-[10px] text-taupe block truncate">IQR • iForest • Vel</span>
               </div>
-              <div className="p-3 rounded-xl bg-surface/70 border border-taupe/15">
-                <span className="text-[11px] text-taupe block uppercase font-mono">SQL Insights</span>
-                <span className="text-xl lg:text-2xl font-bold font-tabular text-text-main">20+ Queries</span>
-                <span className="text-[10px] text-taupe block">PostgreSQL Production</span>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-surface/70 border border-taupe/15">
+                <span className="text-[10px] text-taupe block uppercase font-mono">SQL Insights</span>
+                <span className="text-lg sm:text-xl font-bold font-tabular text-text-main">20+ Queries</span>
+                <span className="text-[10px] text-taupe block truncate">PostgreSQL Prod</span>
               </div>
             </div>
           </div>
