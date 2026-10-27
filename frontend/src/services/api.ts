@@ -12,7 +12,9 @@ import type {
   EvaluateSheetResponse,
   NetworkGraphResponse,
   WhatIfResponse,
-  AuditEvent
+  AuditEvent,
+  GovernanceBenchmarksResponse,
+  DataQualityReport
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -203,4 +205,12 @@ export const api = {
   // Audit Trail
   getAuditTrail: (transactionId: string) =>
     fetchJson<AuditEvent[]>(`/transactions/${transactionId}/audit-trail`),
+
+  // Governance Benchmarking
+  getGovernanceBenchmarks: () =>
+    fetchJson<GovernanceBenchmarksResponse>('/detection/governance-benchmarks'),
+
+  // Data Quality & Profile Report
+  getDataQualityReport: () =>
+    fetchJson<DataQualityReport>('/datasets/quality-report'),
 };

@@ -5,10 +5,11 @@ import {
 } from 'recharts';
 import {
   Layers, Play, Sliders, CheckCircle2, AlertTriangle, Info,
-  TrendingUp, ShieldCheck
+  TrendingUp, ShieldCheck, Scale, Award, ArrowRight, ShieldAlert,
+  DollarSign, Activity
 } from 'lucide-react';
 import { api } from '../services/api';
-import { DetectionRunResponse, ModelMetrics } from '../types';
+import { DetectionRunResponse, ModelMetrics, GovernanceBenchmarksResponse } from '../types';
 import { useTheme } from '../context/ThemeContext';
 
 export const DetectionLabPage: React.FC = () => {
@@ -36,6 +37,23 @@ export const DetectionLabPage: React.FC = () => {
   const [results, setResults] = useState<DetectionRunResponse | null>(null);
   const [running, setRunning] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Governance Benchmark State
+  const [activeTab, setActiveTab] = useState<'interactive' | 'governance'>('interactive');
+  const [governanceData, setGovernanceData] = useState<GovernanceBenchmarksResponse | null>(null);
+  const [loadingGovernance, setLoadingGovernance] = useState(false);
+
+  const fetchGovernance = async () => {
+    setLoadingGovernance(true);
+    try {
+      const data = await api.getGovernanceBenchmarks();
+      setGovernanceData(data);
+    } catch (err: any) {
+      console.error('Failed to load governance benchmarks:', err);
+    } finally {
+      setLoadingGovernance(false);
+    }
+  };
 
   const handleRunModels = async () => {
     setRunning(true);
@@ -102,8 +120,39 @@ export const DetectionLabPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Hyperparameter Configuration Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* View Switcher Tabs */}
+      <div className="flex items-center gap-2 p-1 bg-surface-subtle rounded-xl border border-taupe/20 w-fit">
+        <button
+          onClick={() => setActiveTab('interactive')}
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
+            activeTab === 'interactive'
+              ? 'bg-surface text-text-main shadow-soft border border-taupe/20'
+              : 'text-taupe hover:text-text-main'
+          }`}
+        >
+          <Sliders className="w-3.5 h-3.5" />
+          <span>Interactive Hyperparameter Tuner</span>
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('governance');
+            if (!governanceData) fetchGovernance();
+          }}
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
+            activeTab === 'governance'
+              ? 'bg-surface text-text-main shadow-soft border border-taupe/20'
+              : 'text-taupe hover:text-text-main'
+          }`}
+        >
+          <Scale className="w-3.5 h-3.5 text-accent" />
+          <span>Model Governance & Multi-Run Sensitivity Matrix</span>
+        </button>
+      </div>
+
+      {activeTab === 'interactive' ? (
+        <>
+          {/* Hyperparameter Configuration Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Card 1: IQR Tuning */}
         <div className="p-5 rounded-2xl bg-surface border border-taupe/20 shadow-soft space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-taupe/15">
@@ -395,6 +444,190 @@ export const DetectionLabPage: React.FC = () => {
           </div>
         </div>
       )}
+    </>
+  ) : (
+    /* Governance Sensitivity & Policy Benchmarks View */
+    <div className="space-y-6">
+      {/* Strategic Recommendation Callout */}
+      {governanceData && (
+        <div className="p-6 rounded-2xl bg-accent/10 border border-accent/30 shadow-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono bg-accent text-white uppercase tracking-wider">
+                Optimal Operating Point
+              </span>
+              <span className="text-xs font-bold text-text-main">
+                {governanceData.optimal_policy}
+              </span>
+            </div>
+            <p className="text-xs text-charcoal/90 leading-relaxed max-w-3xl">
+              {governanceData.strategic_guidance}
+            </p>
+          </div>
+
+          <button
+            onClick={fetchGovernance}
+            disabled={loadingGovernance}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-dark transition-colors shrink-0 shadow-soft disabled:opacity-50"
+          >
+            <Activity className="w-3.5 h-3.5" />
+            <span>{loadingGovernance ? 'Evaluating...' : 'Refresh Benchmark Run'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* 3 Policy Comparison Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {governanceData?.policies.map((p) => {
+          const isOptimal = p.policy_name.includes('Balanced') || p.policy_key === 'balanced';
+          return (
+            <div
+              key={p.policy_key}
+              className={`p-5 rounded-2xl bg-surface border transition-all flex flex-col justify-between shadow-soft ${
+                isOptimal
+                  ? 'border-accent ring-2 ring-accent/20'
+                  : 'border-taupe/20'
+              }`}
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-taupe/15">
+                  <h3 className="text-sm font-bold text-text-main flex items-center gap-1.5">
+                    {isOptimal && <Award className="w-4 h-4 text-accent" />}
+                    <span>{p.policy_name.split('(')[0].trim()}</span>
+                  </h3>
+                  {isOptimal && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-accent/15 text-accent-dark font-mono">
+                      RECOMMENDED
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-xs text-taupe leading-relaxed">
+                  {p.description}
+                </p>
+
+                {/* Hyperparameters Pill */}
+                <div className="p-2.5 rounded-xl bg-surface-subtle border border-taupe/15 space-y-1 text-[11px] font-mono">
+                  <div className="flex justify-between text-taupe">
+                    <span>IQR Envelope:</span>
+                    <span className="font-bold text-charcoal">{p.iqr_multiplier}x IQR</span>
+                  </div>
+                  <div className="flex justify-between text-taupe">
+                    <span>iForest Contam:</span>
+                    <span className="font-bold text-charcoal">{(p.iforest_contamination * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between text-taupe">
+                    <span>Velocity Thresh:</span>
+                    <span className="font-bold text-charcoal">{p.velocity_threshold} txns/hr</span>
+                  </div>
+                </div>
+
+                {/* Performance Metrics Grid */}
+                <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                  <div className="p-2 rounded-lg bg-surface-subtle border border-taupe/15">
+                    <span className="text-[10px] text-taupe block">Precision</span>
+                    <span className="font-tabular font-bold text-sm text-text-main">{p.precision}%</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-surface-subtle border border-taupe/15">
+                    <span className="text-[10px] text-taupe block">Recall</span>
+                    <span className="font-tabular font-bold text-sm text-text-main">{p.recall}%</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-surface-subtle border border-taupe/15">
+                    <span className="text-[10px] text-taupe block">Total Alerts</span>
+                    <span className="font-tabular font-bold text-sm text-charcoal">{p.total_alerts.toLocaleString()}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-surface-subtle border border-taupe/15">
+                    <span className="text-[10px] text-taupe block">False Positives</span>
+                    <span className="font-tabular font-bold text-sm text-alert">{p.false_positives}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Value Footer */}
+              <div className="pt-4 mt-4 border-t border-taupe/15 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-taupe">Net Business Value:</span>
+                  <span className="font-tabular font-bold text-sm text-sage">
+                    ₹{p.net_business_value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="text-[10px] text-taupe italic">
+                  {p.suitability}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Multi-Run Sensitivity Benchmark Matrix Table */}
+      <div className="p-6 rounded-2xl bg-surface border border-taupe/20 shadow-soft space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-taupe/20">
+          <div>
+            <h3 className="font-bold text-base text-text-main">
+              Operational Operating Points & Sensitivity Matrix
+            </h3>
+            <p className="text-xs text-taupe">
+              Side-by-side comparison of review workload, false alarms, and net business value across 12,423 transactions
+            </p>
+          </div>
+          <span className="text-[11px] font-mono text-taupe">
+            Ground-Truth Simulated Fraud: {governanceData?.simulated_fraud_count} cases (₹{governanceData?.total_fraud_volume.toLocaleString('en-IN')})
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-surface-subtle text-[11px] font-mono uppercase text-taupe border-b border-taupe/20">
+                <th className="py-3 px-4">Policy Regime</th>
+                <th className="py-3 px-3 text-center">Triage Alerts</th>
+                <th className="py-3 px-3 text-center">True Positives</th>
+                <th className="py-3 px-3 text-center">False Alarms</th>
+                <th className="py-3 px-3 text-center">Precision</th>
+                <th className="py-3 px-3 text-center">Recall</th>
+                <th className="py-3 px-3 text-center">F1 Score</th>
+                <th className="py-3 px-3 text-right">Recovered Exposure</th>
+                <th className="py-3 px-3 text-right">Review Cost (₹150/alert)</th>
+                <th className="py-3 px-4 text-right">Net Business ROI</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-taupe/15 text-charcoal">
+              {governanceData?.policies.map((p) => {
+                const isOptimal = p.policy_name.includes('Balanced') || p.policy_key === 'balanced';
+                return (
+                  <tr
+                    key={p.policy_key}
+                    className={isOptimal ? 'bg-accent/10 font-semibold text-text-main' : 'hover:bg-surface-subtle'}
+                  >
+                    <td className="py-3.5 px-4 font-medium flex items-center gap-2">
+                      {isOptimal && <span className="w-2 h-2 rounded-full bg-accent" />}
+                      <span>{p.policy_name}</span>
+                    </td>
+                    <td className="py-3.5 px-3 font-tabular text-center">{p.total_alerts.toLocaleString()}</td>
+                    <td className="py-3.5 px-3 font-tabular text-center text-sage font-bold">{p.true_positives}</td>
+                    <td className="py-3.5 px-3 font-tabular text-center text-alert">{p.false_positives}</td>
+                    <td className="py-3.5 px-3 font-tabular text-center font-bold">{p.precision}%</td>
+                    <td className="py-3.5 px-3 font-tabular text-center font-bold">{p.recall}%</td>
+                    <td className="py-3.5 px-3 font-tabular text-center font-bold text-accent-dark">{p.f1_score}%</td>
+                    <td className="py-3.5 px-3 font-tabular text-right text-sage font-bold">
+                      ₹{p.estimated_fraud_prevented.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="py-3.5 px-3 font-tabular text-right text-alert">
+                      ₹{p.estimated_investigation_cost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="py-3.5 px-4 font-tabular text-right font-bold text-accent-dark">
+                      ₹{p.net_business_value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )}
     </div>
   );
 };

@@ -50,7 +50,7 @@ def login_with_gmail(req: GmailLoginRequest, db: Session = Depends(get_db)):
             )
         
         # Update user session stats in dataset
-        user.last_login_at = datetime.datetime.utcnow()
+        user.last_login_at = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         user.login_count = (user.login_count or 0) + 1
         if user.password_hash.startswith("oauth_"):
             # Upgrade / add password credential
@@ -69,8 +69,8 @@ def login_with_gmail(req: GmailLoginRequest, db: Session = Depends(get_db)):
             avatar_url=f"https://api.dicebear.com/7.x/initials/svg?seed={full_name}",
             role="Risk Analyst",
             login_count=1,
-            last_login_at=datetime.datetime.utcnow(),
-            created_at=datetime.datetime.utcnow()
+            last_login_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
+            created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         )
         db.add(user)
         db.commit()
@@ -105,7 +105,7 @@ def login_with_oauth(req: OAuthLoginRequest, db: Session = Depends(get_db)):
     if user:
         user.provider = provider
         user.login_count = (user.login_count or 0) + 1
-        user.last_login_at = datetime.datetime.utcnow()
+        user.last_login_at = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         if req.avatar_url:
             user.avatar_url = req.avatar_url
         if req.full_name and not user.full_name:
@@ -125,8 +125,8 @@ def login_with_oauth(req: OAuthLoginRequest, db: Session = Depends(get_db)):
             avatar_url=avatar,
             role="Risk Analyst",
             login_count=1,
-            last_login_at=datetime.datetime.utcnow(),
-            created_at=datetime.datetime.utcnow()
+            last_login_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
+            created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         )
         db.add(user)
         db.commit()

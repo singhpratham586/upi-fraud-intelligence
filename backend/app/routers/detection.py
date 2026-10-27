@@ -7,7 +7,8 @@ from app.database import get_db
 from app.models.transaction import Transaction, DetectionResult
 from app.schemas.detection import (
     DetectionRunRequest, DetectionRunResponse,
-    ModelMetrics, AnomalyScoreHistogramBin
+    ModelMetrics, AnomalyScoreHistogramBin,
+    GovernancePolicyBenchmark, GovernanceBenchmarksResponse
 )
 from app.services.iqr_detector import run_iqr_detection
 from app.services.isolation_forest import run_isolation_forest
@@ -157,4 +158,116 @@ def run_interactive_detection(payload: DetectionRunRequest, db: Session = Depend
             ModelMetrics(**m_ens)
         ],
         score_distribution=score_bins
+    )
+
+@router.get("/governance-benchmarks", response_model=GovernanceBenchmarksResponse)
+def get_governance_benchmarks(db: Session = Depends(get_db)):
+    """
+    Evaluates three versioned policy regimes (Conservative, Balanced, Aggressive)
+    against independent ground truth to establish governance trade-offs between
+    analyst triage burden and fraud exposure.
+    """
+    df = _load_transactions_dataframe(db)
+    if len(df) == 0:
+        return GovernanceBenchmarksResponse(
+            status="no_data",
+            total_records=0,
+            simulated_fraud_count=0,
+            total_fraud_volume=0.0,
+            policies=[],
+            optimal_policy="Balanced Baseline",
+            strategic_guidance="No transaction records currently available for benchmarking."
+        )
+
+    y_true = df["is_fraud_simulated"]
+    amounts = df["amount"]
+    total_fraud_cnt = int(y_true.sum())
+    total_fraud_vol = float(amounts[y_true].sum())
+
+    policy_specs = [
+        {
+            "key": "conservative",
+            "name": "Conservative Policy (Low Operational Friction)",
+            "description": "Strict detection thresholds flagging only acute statistical outliers. Minimizes customer contact friction and analyst triage queues.",
+            "iqr_multiplier": 2.2,
+            "iforest_contamination": 0.02,
+            "velocity_threshold": 6,
+            "suitability": "Lean fraud response units with restricted investigation headcount prioritizing precision."
+        },
+        {
+            "key": "balanced",
+            "name": "Balanced Baseline Policy (Production Calibrated)",
+            "description": "Standard multi-model ensemble calibrated across statistical IQR, isolation trees, and velocity bursts.",
+            "iqr_multiplier": 1.5,
+            "iforest_contamination": 0.035,
+            "velocity_threshold": 4,
+            "suitability": "Standard fintech production operations balancing comprehensive coverage with SLA compliance."
+        },
+        {
+            "key": "aggressive",
+            "name": "Aggressive Policy (Loss Minimization)",
+            "description": "Sensitive risk boundary capturing low-velocity probes and edge-case anomalies. Generates higher alert queues.",
+            "iqr_multiplier": 1.2,
+            "iforest_contamination": 0.05,
+            "velocity_threshold": 3,
+            "suitability": "High-risk merchant flows, festive peak campaigns, or elevated threat environments."
+        }
+    ]
+
+    benchmarks: List[GovernancePolicyBenchmark] = []
+
+    for spec in policy_specs:
+        iqr_f, iqr_s, _, _ = run_iqr_detection(df, feature="amount", multiplier=spec["iqr_multiplier"])
+        if_f, if_s, _, _ = run_isolation_forest(df, contamination=spec["iforest_contamination"], n_estimators=100, random_seed=42)
+        ts_f, ts_s, _, _ = run_time_series_detection(df, velocity_count_threshold=spec["velocity_threshold"], amount_deviation_sigma=3.0, short_window_seconds=300)
+        
+        _, risk_levels, _ = compute_ensemble_scores(df, iqr_f, iqr_s, if_f, if_s, ts_f, ts_s)
+        flagged = risk_levels.isin(["HIGH", "CRITICAL"])
+        
+        m = compute_model_metrics(y_true, flagged, spec["name"], amounts)
+        
+        tp_amt = float(amounts[flagged & y_true].sum())
+        est_fraud_prevented = round(tp_amt * 0.85, 2)
+        est_inv_cost = round(int(flagged.sum()) * 150.0, 2)
+        net_val = round(est_fraud_prevented - est_inv_cost, 2)
+
+        benchmarks.append(GovernancePolicyBenchmark(
+            policy_name=spec["name"],
+            policy_key=spec["key"],
+            description=spec["description"],
+            iqr_multiplier=spec["iqr_multiplier"],
+            iforest_contamination=spec["iforest_contamination"],
+            velocity_threshold=spec["velocity_threshold"],
+            total_alerts=m["total_alerts"],
+            true_positives=m["true_positives"],
+            false_positives=m["false_positives"],
+            precision=m["precision"],
+            recall=m["recall"],
+            f1_score=m["f1_score"],
+            false_positive_rate=m["false_positive_rate"],
+            flagged_amount_sum=m["flagged_amount_sum"],
+            estimated_fraud_prevented=est_fraud_prevented,
+            estimated_investigation_cost=est_inv_cost,
+            net_business_value=net_val,
+            suitability=spec["suitability"]
+        ))
+
+    # Determine highest net business value policy
+    best_policy = max(benchmarks, key=lambda b: b.net_business_value)
+
+    guidance = (
+        f"The {best_policy.policy_name} achieves the highest net business return of ₹{best_policy.net_business_value:,.2f} "
+        f"by recovering ₹{best_policy.estimated_fraud_prevented:,.2f} in simulated exposure while containing operational review costs "
+        f"to ₹{best_policy.estimated_investigation_cost:,.2f} ({best_policy.total_alerts:,} total alerts at ₹150/case). "
+        f"Model governance committee recommends operating at this baseline."
+    )
+
+    return GovernanceBenchmarksResponse(
+        status="success",
+        total_records=len(df),
+        simulated_fraud_count=total_fraud_cnt,
+        total_fraud_volume=round(total_fraud_vol, 2),
+        policies=benchmarks,
+        optimal_policy=best_policy.policy_name,
+        strategic_guidance=guidance
     )

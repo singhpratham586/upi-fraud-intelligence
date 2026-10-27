@@ -379,3 +379,71 @@ export interface AuditEvent {
   details?: string | null;
   created_at: string;
 }
+
+export interface GovernancePolicyBenchmark {
+  policy_name: string;
+  policy_key: string;
+  description: string;
+  iqr_multiplier: number;
+  iforest_contamination: number;
+  velocity_threshold: number;
+  total_alerts: number;
+  true_positives: number;
+  false_positives: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  false_positive_rate: number;
+  flagged_amount_sum: number;
+  estimated_fraud_prevented: number;
+  estimated_investigation_cost: number;
+  net_business_value: number;
+  suitability: string;
+}
+
+export interface GovernanceBenchmarksResponse {
+  status: string;
+  total_records: number;
+  simulated_fraud_count: number;
+  total_fraud_volume: number;
+  policies: GovernancePolicyBenchmark[];
+  optimal_policy: string;
+  strategic_guidance: string;
+}
+
+export interface ColumnQuality {
+  column: string;
+  missing_count: number;
+  missing_pct: number;
+  data_type: string;
+}
+
+export interface AmountProfile {
+  min: number;
+  max: number;
+  mean: number;
+  median: number;
+  std: number;
+  p95: number;
+  p99: number;
+  skewness: number;
+}
+
+export interface DataQualityReport {
+  status: string;
+  dataset_version: string;
+  total_records: number;
+  integrity_score_pct: number;
+  duplicate_records: number;
+  unique_senders: number;
+  unique_receivers: number;
+  time_span_start: string;
+  time_span_end: string;
+  amount_profile: AmountProfile;
+  simulated_fraud_count: number;
+  simulated_fraud_rate_pct: number;
+  columns_analyzed: ColumnQuality[];
+  label_leakage_prevented: boolean;
+  scenario_breakdown: Record<string, number>;
+  generated_at: string;
+}

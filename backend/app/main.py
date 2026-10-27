@@ -1,6 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+from app.database import engine, Base
+import app.models.transaction
+import app.models.audit
+import app.models.user
+
+# Ensure database tables exist across SQLite / PostgreSQL
+Base.metadata.create_all(bind=engine)
+
 from app.routers import (
     analytics,
     transactions,

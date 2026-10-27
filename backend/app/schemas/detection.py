@@ -55,3 +55,32 @@ class DetectionRunResponse(BaseModel):
     ensemble_high_risk: int
     model_comparison: List[ModelMetrics]
     score_distribution: List[AnomalyScoreHistogramBin]
+
+class GovernancePolicyBenchmark(BaseModel):
+    policy_name: str
+    policy_key: str
+    description: str
+    iqr_multiplier: float
+    iforest_contamination: float
+    velocity_threshold: int
+    total_alerts: int
+    true_positives: int
+    false_positives: int
+    precision: float
+    recall: float
+    f1_score: float
+    false_positive_rate: float
+    flagged_amount_sum: float
+    estimated_fraud_prevented: float
+    estimated_investigation_cost: float
+    net_business_value: float
+    suitability: str
+
+class GovernanceBenchmarksResponse(BaseModel):
+    status: str
+    total_records: int
+    simulated_fraud_count: int
+    total_fraud_volume: float
+    policies: List[GovernancePolicyBenchmark]
+    optimal_policy: str
+    strategic_guidance: str

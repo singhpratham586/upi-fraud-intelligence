@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { X, ShieldAlert, CheckCircle2, Clock, MapPin, Smartphone, User, ArrowRight, Save, AlertCircle } from 'lucide-react';
-import { Transaction, Investigation } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, ShieldAlert, CheckCircle2, Clock, MapPin, Smartphone, User, ArrowRight, Save, AlertCircle, History, UserCheck, ShieldCheck } from 'lucide-react';
+import { Transaction, Investigation, AuditEvent } from '../types';
 import { api } from '../services/api';
 
 interface TransactionModalProps {
@@ -21,6 +21,29 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   const [notes, setNotes] = useState<string>(transaction.investigation?.analyst_notes || '');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+
+  const fetchAuditEvents = async () => {
+    if (!transaction) return;
+    setIsLoadingAudit(true);
+    try {
+      const events = await api.getAuditTrail(transaction.id);
+      setAuditEvents(events);
+    } catch (err) {
+      console.error('Failed to load audit trail:', err);
+    } finally {
+      setIsLoadingAudit(false);
+    }
+  };
+
+  useEffect(() => {
+    if (transaction?.id) {
+      setReviewStatus(transaction.investigation?.review_status || 'New');
+      setNotes(transaction.investigation?.analyst_notes || '');
+      fetchAuditEvents();
+    }
+  }, [transaction?.id]);
 
   const riskLevel = transaction.detection?.risk_level || 'LOW';
   const riskScore = transaction.detection?.ensemble_risk_score || 0;
@@ -36,6 +59,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       });
       onUpdate(updated);
       setSaveSuccess(true);
+      await fetchAuditEvents();
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (err) {
       alert('Failed to update investigation status: ' + err);
@@ -295,6 +319,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 <option value="Under Review">Under Review (Analyst Assigned)</option>
                 <option value="Reviewed">Reviewed (Cleared Legitimate)</option>
                 <option value="Escalated">Escalated (Tier 2 Fraud Operations)</option>
+                <option value="Closed">Closed (Resolved & Dismissed)</option>
               </select>
             </div>
 
@@ -328,6 +353,62 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 {isSaving ? 'Saving...' : 'Update Investigation Record'}
               </button>
             </div>
+          </div>
+
+          {/* Audit Trail & Event Timeline */}
+          <div className="p-4 rounded-xl bg-surface border border-taupe/20 space-y-3 shadow-soft">
+            <div className="flex items-center justify-between pb-2 border-b border-taupe/15">
+              <h4 className="text-xs font-bold text-text-main flex items-center gap-1.5 uppercase tracking-wider font-mono">
+                <History className="w-3.5 h-3.5 text-accent" />
+                Audit Trail & Historical Actions ({auditEvents.length})
+              </h4>
+              <span className="text-[10px] text-taupe font-mono">Immutable Ledger</span>
+            </div>
+
+            {isLoadingAudit ? (
+              <div className="py-4 text-center text-xs text-taupe">Loading audit events...</div>
+            ) : auditEvents.length === 0 ? (
+              <p className="text-xs text-taupe italic py-2">
+                No previous audit updates recorded for this record yet. Any updates to status or notes are permanently captured.
+              </p>
+            ) : (
+              <div className="relative pl-4 space-y-3 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-taupe/25">
+                {auditEvents.map((evt) => (
+                  <div key={evt.id} className="relative text-xs space-y-1">
+                    <span className="absolute -left-4 top-1.5 w-2 h-2 rounded-full bg-accent ring-2 ring-surface" />
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-text-main flex items-center gap-1.5">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent/15 text-accent-dark">
+                          {evt.action}
+                        </span>
+                        {evt.previous_status && evt.new_status && (
+                          <span className="text-[11px] text-charcoal">
+                            {evt.previous_status} → <span className="font-bold">{evt.new_status}</span>
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-[10px] font-mono text-taupe">
+                        {new Date(evt.created_at).toLocaleString('en-IN', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                    {evt.details && (
+                      <p className="text-[11px] text-taupe/90 bg-surface-subtle p-2 rounded border border-taupe/15">
+                        "{evt.details}"
+                      </p>
+                    )}
+                    <div className="text-[10px] text-taupe font-mono flex items-center gap-1">
+                      <UserCheck className="w-3 h-3 text-taupe" />
+                      <span>{evt.analyst_name || evt.analyst_id}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

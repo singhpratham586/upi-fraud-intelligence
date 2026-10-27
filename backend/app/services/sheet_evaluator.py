@@ -137,9 +137,9 @@ def normalize_and_engineer_sheet(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[s
     if time_col:
         col_mapping[time_col] = 'timestamp'
         df['timestamp'] = pd.to_datetime(df[time_col], errors='coerce')
-        df['timestamp'] = df['timestamp'].fillna(datetime.datetime.utcnow())
+        df['timestamp'] = df['timestamp'].fillna(datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None))
     else:
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         df['timestamp'] = [now - datetime.timedelta(minutes=i * 5) for i in range(len(df))]
 
     # Sender ID / Payer
@@ -344,7 +344,7 @@ def evaluate_sheet_dataframe(df: pd.DataFrame, filename: str) -> Dict[str, Any]:
     ]
 
     # 3. Hourly Heatmap (day_of_week, day_name, hour, total_count, flagged_count, avg_amount)
-    df['day_of_week'] = df['timestamp'].dt.dayofweek
+    df['day_of_week'] = df['timestamp'].dt.day_of_week
     days_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     df['day_name'] = df['day_of_week'].map(lambda d: days_names[d])
     df['hour'] = df['timestamp'].dt.hour
@@ -523,7 +523,7 @@ def persist_evaluated_sheet_to_database(db: Session, df: pd.DataFrame, filename:
     """
     Persists evaluated transactions, detection results, and investigations into SQLite/PostgreSQL.
     """
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
     # Clear existing transactions or replace with new dataset
     db.query(Investigation).delete()

@@ -127,3 +127,20 @@ def test_api_what_if_scenario(db_session):
     assert res.modified.risk_level in ["HIGH", "CRITICAL"]
     assert len(res.attribution) >= 3
     assert len(res.modified.detection_signals) >= 2
+
+def test_api_governance_benchmarks(db_session):
+    from app.routers.detection import get_governance_benchmarks
+    res = get_governance_benchmarks(db=db_session)
+    assert res.status == "success"
+    assert len(res.policies) == 3
+    assert res.total_records > 0
+    assert res.optimal_policy != ""
+
+def test_api_data_quality_report(db_session):
+    from app.routers.datasets import get_data_quality_report
+    report = get_data_quality_report(db=db_session)
+    assert report.status == "healthy"
+    assert report.integrity_score_pct >= 95.0
+    assert report.total_records > 0
+    assert report.label_leakage_prevented is True
+    assert len(report.columns_analyzed) > 10

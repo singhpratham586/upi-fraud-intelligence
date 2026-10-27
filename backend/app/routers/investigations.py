@@ -42,7 +42,7 @@ def update_transaction_investigation(
         raise HTTPException(status_code=404, detail=f"Transaction '{transaction_id}' not found.")
 
     inv = db.query(Investigation).filter(Investigation.transaction_id == transaction_id).first()
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
     prev_status = inv.review_status if inv else "New"
 
