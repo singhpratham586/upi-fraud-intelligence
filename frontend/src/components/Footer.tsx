@@ -60,7 +60,12 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="pt-6 border-t border-taupe/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-taupe">
-          <p>© 2026 UPI Fraud Intelligence Platform. Designed for senior analytical evaluation.</p>
+          <div className="space-y-0.5 text-center sm:text-left">
+            <p>© 2026 UPI Fraud Intelligence Platform. Designed for senior analytical evaluation.</p>
+            <p className="text-[10px] text-taupe/90">
+              Designed by <span className="font-semibold text-text-main">Pratham Singh Bisht</span>
+            </p>
+          </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1 font-mono text-[10px] bg-taupe/10 px-2 py-0.5 rounded">
               <Code2 className="w-3 h-3" /> Python 3.13 / FastAPI / PostgreSQL
