@@ -26,13 +26,13 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-taupe/20 bg-background/90 backdrop-blur-md">
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link to="/" className="btn-wobble flex items-center gap-2.5 group shrink-0">
+        <Link to="/" className="btn-wobble flex items-center gap-2 group shrink-0">
           <img
             src="/brand-icon.jpg"
             alt="UPI Fraud Intelligence Logo"
-            className="w-9 h-9 rounded-xl object-cover shadow-soft border border-taupe/25 group-hover:border-accent transition-colors duration-200"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-cover shadow-soft border border-taupe/25 group-hover:border-accent transition-colors duration-200"
           />
           <div>
             <span className="font-semibold text-sm sm:text-base tracking-tight text-text-main flex items-center gap-1.5">
@@ -41,7 +41,7 @@ export const Navbar: React.FC = () => {
                 PROD
               </span>
             </span>
-            <span className="hidden xl:block text-[11px] text-taupe leading-none">
+            <span className="hidden 2xl:block text-[11px] text-taupe leading-none">
               Transaction Risk Analytics Platform
             </span>
           </div>
@@ -56,7 +56,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`btn-wobble flex items-center gap-1 xl:gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`btn-wobble flex items-center gap-1 xl:gap-1.5 px-1.5 xl:px-2 py-1 rounded-lg text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-charcoal text-surface shadow-soft'
                     : 'text-charcoal/80 hover:text-text-main hover:bg-surface/60'
@@ -70,15 +70,15 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Status Indicator, Auth Controls & Theme Toggle */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* User Auth State / Sign In Button */}
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-2 bg-surface border border-taupe/20 rounded-xl px-2.5 py-1 shadow-soft">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-surface border border-taupe/20 rounded-xl px-2 py-1 shadow-soft">
               <div className="w-6 h-6 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs">
                 {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
               </div>
               <div className="hidden sm:flex flex-col text-left leading-none">
-                <span className="text-xs font-semibold text-text-main truncate max-w-[90px] xl:max-w-[130px]">
+                <span className="text-xs font-semibold text-text-main truncate max-w-[80px] xl:max-w-[110px]">
                   {user.full_name || 'Analyst'}
                 </span>
                 <span className="text-[10px] text-taupe capitalize font-mono">
@@ -88,7 +88,7 @@ export const Navbar: React.FC = () => {
               <button
                 onClick={logout}
                 title="Sign Out"
-                className="p-1 rounded-lg text-taupe hover:text-alert-red hover:bg-alert-red/10 transition-colors ml-1"
+                className="p-1 rounded-lg text-taupe hover:text-alert-red hover:bg-alert-red/10 transition-colors ml-0.5"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
@@ -117,9 +117,13 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          <div className="btn-wobble cursor-default hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft">
-            <span className="w-2 h-2 rounded-full bg-sage animate-pulse" />
-            <span>PostgreSQL Active</span>
+          <div
+            className="btn-wobble cursor-default hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface border border-taupe/20 text-[11px] text-charcoal font-medium shadow-soft"
+            title="PostgreSQL Database Connected & Active"
+          >
+            <span className="w-2 h-2 rounded-full bg-sage animate-pulse shrink-0" />
+            <span className="hidden 2xl:inline">PostgreSQL Active</span>
+            <span className="inline 2xl:hidden font-mono text-[10px]">Postgres</span>
           </div>
           <Link
             to="/transactions"

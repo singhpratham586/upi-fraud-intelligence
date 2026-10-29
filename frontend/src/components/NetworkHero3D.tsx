@@ -157,7 +157,7 @@ export const NetworkHero3D: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-[360px] sm:h-[400px] lg:h-[440px] xl:h-[460px] rounded-2xl bg-surface/80 border border-taupe/20 relative overflow-hidden shadow-elevated">
+    <div className="w-full max-w-[600px] mx-auto lg:mr-0 h-[350px] sm:h-[390px] lg:h-[420px] xl:h-[440px] rounded-2xl bg-surface/80 border border-taupe/20 relative overflow-hidden shadow-elevated">
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/90 backdrop-blur border border-taupe/20 text-[11px] text-charcoal">
         <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
         <span className="font-mono font-medium">3D Topology • Realtime Spatial Signals</span>
